@@ -24,11 +24,6 @@ Program to implement Linear and Polynomial Regression models for predicting car 
 Developed by:RAGHUL.S 
 RegisterNumber: 212225040325 
 */
-/*
-Program to implement Linear and Polynomial Regression models for predicting car prices.
-Developed by: Anisha A
-RegisterNumber: 212225220009
-*/
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
