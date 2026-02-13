@@ -24,43 +24,58 @@ Program to implement Linear and Polynomial Regression models for predicting car 
 Developed by:RAGHUL.S 
 RegisterNumber: 212225040325 
 */
-
+/*
+Program to implement Linear and Polynomial Regression models for predicting car prices.
+Developed by: Anisha A
+RegisterNumber: 212225220009
+*/
 import pandas as pd
+from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split,cross_val_score
-from sklearn.metrics import mean_squared_error, r2_score,mean_absolute_error,mean_absolute_error
+from sklearn.preprocessing import PolynomialFeatures,StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import mean_squared_error,r2_score,mean_absolute_error
 import matplotlib.pyplot as plt
-data=pd.read_csv('CarPrice_Assignment.csv')
-
-data=data.drop(['car_ID','CarName'],axis=1)#removes unnecessary columns
-data = pd.get_dummies(data, drop_first=True)# Handle categorical variables
-
-X = data.drop('price', axis=1)
-Y = data['price']
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
-
-model = LinearRegression()
-model.fit(X_train, Y_train)
-
-print("Name: RAGHUL.S")
-print("Reg. No: 212225040325")
-print("\n=== Cross-validation ===")
-cv_scores=cross_val_score(model,X,Y,cv=5)
-print("Fold R2 scores:",[f"{score:.4f}" for score in cv_scores])
-print(f"Average R2: {cv_scores.mean():.4f}")
-# 5. Test set evaluation
-Y_pred = model.predict(X_test)
-print("\n=== Test Set Performance ===")
-print(f"MSE: {mean_squared_error(Y_test, Y_pred):.2f}")
-print(f"MAE: {mean_absolute_error(Y_test, Y_pred):.2f}")
-print(f"R²: {r2_score(Y_test, Y_pred):.4f}")
-plt.figure(figsize=(8, 6))
-plt.scatter(Y_test, Y_pred, alpha=0.6)
-plt.plot([Y_test.min(), Y_test.max()],[Y_test.min(), Y_test.max()],'r--')
+df=pd.read_csv('encoded_car_data (1).csv')
+print(df.head())
+X=df[['enginesize','horsepower','citympg','highwaympg']]
+Y=df['price']
+X_train,X_test,Y_train,Y_test=train_test_split(X,Y,test_size=0.2,random_state=42)
+#1.linear regression(with scaling)
+lr=Pipeline([
+    ('scaler',StandardScaler()),
+    ('model',LinearRegression())
+])
+lr.fit(X_train,Y_train)
+Y_pred_linear=lr.predict(X_test)
+#2.polynomial regression(degree=2)
+poly_model=Pipeline([
+    ('poly',PolynomialFeatures(degree=2)),
+    ('scaler',StandardScaler()),
+    ('model',LinearRegression())
+])
+poly_model.fit(X_train,Y_train)
+Y_pred_poly=poly_model.predict(X_test)
+#evaluate models
+print('Name: RAGHUL.S')
+print('reg. No.: 212225040325')
+print("Linear Regression:")
+print("MSE=",mean_squared_error(Y_test,Y_pred_linear))
+print('MAE=',mean_absolute_error(Y_test,Y_pred_linear))
+print("R2 Score=",r2_score(Y_test,Y_pred_linear))
+print("\nPolynomial Regression:")
+print("MSE=",mean_squared_error(Y_test,Y_pred_poly))
+print('MAE=',mean_absolute_error(Y_test,Y_pred_poly))
+print(f"R2 Score= {r2_score(Y_test,Y_pred_poly):.2f}")
+#plot actual vs predict
+plt.figure(figsize=(10,5))
+plt.scatter(Y_test,Y_pred_poly,label='linear',alpha=0.6)
+plt.scatter(Y_test,Y_pred_poly,label='Polynomial (degree=2)',alpha=0.6)
+plt.plot([Y.min(), Y.max()], [Y.min(), Y.max()], 'r--', label='Perfect Prediction')
 plt.xlabel("Actual Price")
 plt.ylabel("Predicted Price")
-plt.title("Actual vs Predicted Car Prices")
-plt.grid(True)
+plt.title("Linear vs Polynomial Regression")
+plt.legend()
 plt.show()
 ~~~
 
